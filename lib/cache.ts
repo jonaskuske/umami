@@ -4,7 +4,7 @@ import { getSession, getUser, getWebsite } from '../queries';
 
 const DELETED = 'DELETED';
 
-async function fetchObject(key, query) {
+async function fetchObject(key: string, query) {
   const obj = await redis.get(key);
 
   if (obj === DELETED) {
@@ -32,7 +32,7 @@ async function deleteObject(key, soft = false) {
   return soft ? redis.set(key, DELETED) : redis.del(key);
 }
 
-async function fetchWebsite(id): Promise<Website> {
+async function fetchWebsite(id: string): Promise<Website> {
   return fetchObject(`website:${id}`, () => getWebsite({ id }));
 }
 
@@ -43,11 +43,11 @@ async function storeWebsite(data) {
   return storeObject(key, data);
 }
 
-async function deleteWebsite(id) {
+async function deleteWebsite(id: string) {
   return deleteObject(`website:${id}`);
 }
 
-async function fetchUser(id): Promise<User> {
+async function fetchUser(id: string): Promise<User> {
   return fetchObject(`user:${id}`, () => getUser({ id }, { includePassword: true }));
 }
 
@@ -58,11 +58,11 @@ async function storeUser(data) {
   return storeObject(key, data);
 }
 
-async function deleteUser(id) {
+async function deleteUser(id: string) {
   return deleteObject(`user:${id}`);
 }
 
-async function fetchSession(id) {
+async function fetchSession(id: string) {
   return fetchObject(`session:${id}`, () => getSession({ id }));
 }
 
@@ -73,8 +73,13 @@ async function storeSession(data) {
   return storeObject(key, data);
 }
 
-async function deleteSession(id) {
+async function deleteSession(id: string) {
   return deleteObject(`session:${id}`);
+}
+
+async function fetchUsageLimit(accountId: string) {
+  const key = `usageLimit:${accountId}`;
+  return redis.get(key);
 }
 
 export default {
@@ -87,5 +92,6 @@ export default {
   fetchSession,
   storeSession,
   deleteSession,
+  fetchUsageLimit,
   enabled: redis.enabled,
 };

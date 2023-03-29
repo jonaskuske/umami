@@ -1,12 +1,18 @@
-import { createMiddleware, unauthorized, badRequest, parseSecureToken } from 'next-basics';
-import debug from 'debug';
-import cors from 'cors';
-import { validate } from 'uuid';
 import redis from '@umami/redis-client';
-import { findSession } from 'lib/session';
+import cors from 'cors';
+import debug from 'debug';
 import { getAuthToken, parseShareToken } from 'lib/auth';
-import { secret } from 'lib/crypto';
 import { ROLES } from 'lib/constants';
+import { secret } from 'lib/crypto';
+import { findSession } from 'lib/session';
+import {
+  badRequest,
+  createMiddleware,
+  parseSecureToken,
+  tooManyRequest,
+  unauthorized,
+} from 'next-basics';
+import { validate } from 'uuid';
 import { getUser } from '../queries';
 
 const log = debug('umami:middleware');
@@ -19,15 +25,27 @@ export const useCors = createMiddleware(
 );
 
 export const useSession = createMiddleware(async (req, res, next) => {
-  const session = await findSession(req);
+  try {
+    const session = await findSession(req);
 
-  if (!session) {
-    log('useSession: Session not found');
+    if (!session) {
+      log('useSession: Session not found');
+      return badRequest(res);
+    }
+
+    (req as any).session = session;
+    next();
+  } catch ({ message }: any) {
+    if (message === 'Website not found.') {
+      return badRequest(res, message);
+    }
+
+    if (message === 'Website has exceeded collection limit.') {
+      return tooManyRequest(res, message);
+    }
+
     return badRequest(res);
   }
-
-  (req as any).session = session;
-  next();
 });
 
 export const useAuth = createMiddleware(async (req, res, next) => {
