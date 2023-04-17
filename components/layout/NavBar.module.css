@@ -49,6 +49,10 @@
   border-bottom: 2px solid transparent;
 }
 
+.links span {
+  white-space: nowrap;
+}
+
 .links a:hover {
   color: var(--font-color100);
   border-bottom: 2px solid var(--primary400);
@@ -59,7 +63,8 @@
   border-bottom: 2px solid var(--primary400);
 }
 
-.actions {
+.actions,
+.mobile {
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -67,9 +72,17 @@
   min-width: 0;
 }
 
+.mobile {
+  display: none;
+}
+
 @media only screen and (max-width: 768px) {
   .links,
   .actions {
     display: none;
+  }
+
+  .mobile {
+    display: flex;
   }
 }

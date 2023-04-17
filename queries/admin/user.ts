@@ -17,12 +17,14 @@ export async function getUser(
       username: true,
       password: includePassword,
       role: true,
+      createdAt: true,
     },
   });
 }
 
 export async function getUsers(): Promise<User[]> {
   return prisma.client.user.findMany({
+    take: 100,
     where: {
       deletedAt: null,
     },

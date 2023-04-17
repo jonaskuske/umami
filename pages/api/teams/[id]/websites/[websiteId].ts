@@ -5,26 +5,27 @@ import { NextApiResponse } from 'next';
 import { methodNotAllowed, ok, unauthorized } from 'next-basics';
 import { deleteTeamWebsite } from 'queries/admin/teamWebsite';
 
-export interface TeamWebsiteRequestQuery {
+export interface TeamWebsitesRequestQuery {
   id: string;
+  websiteId: string;
 }
 
 export default async (
-  req: NextApiRequestQueryBody<TeamWebsiteRequestQuery>,
+  req: NextApiRequestQueryBody<TeamWebsitesRequestQuery>,
   res: NextApiResponse,
 ) => {
   await useAuth(req, res);
 
-  const { id: teamWebsiteId } = req.query;
+  const { id: teamId, websiteId } = req.query;
 
   if (req.method === 'DELETE') {
-    if (!(await canDeleteTeamWebsite(req.auth, teamWebsiteId))) {
+    if (!(await canDeleteTeamWebsite(req.auth, teamId, websiteId))) {
       return unauthorized(res);
     }
 
-    const websites = await deleteTeamWebsite(teamWebsiteId);
+    await deleteTeamWebsite(teamId, websiteId);
 
-    return ok(res, websites);
+    return ok(res);
   }
 
   return methodNotAllowed(res);

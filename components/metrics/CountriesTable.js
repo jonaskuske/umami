@@ -1,11 +1,10 @@
 import MetricsTable from './MetricsTable';
-import { percentFilter } from 'lib/filters';
 import FilterLink from 'components/common/FilterLink';
 import useCountryNames from 'hooks/useCountryNames';
 import useLocale from 'hooks/useLocale';
 import useMessages from 'hooks/useMessages';
 
-export default function CountriesTable({ websiteId, onDataLoad, ...props }) {
+export default function CountriesTable({ websiteId, ...props }) {
   const { locale } = useLocale();
   const countryNames = useCountryNames(locale);
   const { formatMessage, labels } = useMessages();
@@ -25,7 +24,6 @@ export default function CountriesTable({ websiteId, onDataLoad, ...props }) {
       type="country"
       metric={formatMessage(labels.visitors)}
       websiteId={websiteId}
-      onDataLoad={data => onDataLoad?.(percentFilter(data))}
       renderLabel={renderLink}
     />
   );
