@@ -45,10 +45,13 @@ export default async (
 
       const token = createSecureToken({ userId: user.id }, secret());
 
-      return ok(res, { token, user });
+      return ok(res, {
+        token,
+        user: { id: user.id, username: user.username, createdAt: user.createdAt },
+      });
     }
 
-    return unauthorized(res, 'Incorrect username and/or password.');
+    return unauthorized(res, 'message.incorrect-username-password');
   }
 
   return methodNotAllowed(res);

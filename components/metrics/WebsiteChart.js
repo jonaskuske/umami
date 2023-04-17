@@ -15,9 +15,9 @@ import useTimezone from 'hooks/useTimezone';
 import usePageQuery from 'hooks/usePageQuery';
 import { getDateArray, getDateLength } from 'lib/date';
 import Icons from 'components/icons';
-import styles from './WebsiteChart.module.css';
 import useSticky from 'hooks/useSticky';
 import useMessages from 'hooks/useMessages';
+import styles from './WebsiteChart.module.css';
 
 export default function WebsiteChart({
   websiteId,
@@ -33,13 +33,16 @@ export default function WebsiteChart({
   const { startDate, endDate, unit, value, modified } = dateRange;
   const [timezone] = useTimezone();
   const {
-    query: { url, referrer, os, browser, device, country, title },
+    query: { url, referrer, os, browser, device, country, region, city, title },
   } = usePageQuery();
   const { get, useQuery } = useApi();
   const { ref, isSticky } = useSticky({ enabled: stickyHeader });
 
   const { data, isLoading, error } = useQuery(
-    ['websites:pageviews', { websiteId, modified, url, referrer, os, browser, device, country }],
+    [
+      'websites:pageviews',
+      { websiteId, modified, url, referrer, os, browser, device, country, region, city, title },
+    ],
     () =>
       get(`/websites/${websiteId}/pageviews`, {
         startAt: +startDate,
@@ -52,6 +55,9 @@ export default function WebsiteChart({
         browser,
         device,
         country,
+        region,
+        city,
+        title,
       }),
     { onSuccess: onDataLoad },
   );
@@ -82,7 +88,7 @@ export default function WebsiteChart({
       </WebsiteHeader>
       <FilterTags
         websiteId={websiteId}
-        params={{ url, referrer, os, browser, device, country, title }}
+        params={{ url, referrer, os, browser, device, country, region, city, title }}
       />
       <Row
         ref={ref}
@@ -91,12 +97,14 @@ export default function WebsiteChart({
           [styles.isSticky]: isSticky,
         })}
       >
-        <Column>
+        <Column defaultSize={12} xl={8}>
           <MetricsBar websiteId={websiteId} />
         </Column>
-        <Column className={styles.actions}>
-          <RefreshButton websiteId={websiteId} isLoading={isLoading} />
-          <DateFilter websiteId={websiteId} value={value} className={styles.dropdown} />
+        <Column defaultSize={12} xl={4}>
+          <div className={styles.actions}>
+            <RefreshButton websiteId={websiteId} isLoading={isLoading} />
+            <DateFilter websiteId={websiteId} value={value} className={styles.dropdown} />
+          </div>
         </Column>
       </Row>
       <Row>
